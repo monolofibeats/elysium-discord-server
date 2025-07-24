@@ -33,7 +33,7 @@ def save_json(filename, data):
         json.dump(data, f, indent=2, ensure_ascii=False)
 
 def load_submissions():
-    with open("submissions.json", "r") as f:
+    with open("campaign-ui/campaign-ui/submissions.json", "r") as f:
         return json.load(f)
 
 def load_campaign_responses():
@@ -425,7 +425,7 @@ class CreatorInfoModal(Modal):
 
         # Nun final speichern
         try:
-            with open("submissions.json", "r") as f:
+            with open("campaign-ui/campaign-ui/submissions.json", "r") as f:
                 submissions = json.load(f)
         except:
             submissions = []
@@ -448,7 +448,7 @@ class CreatorInfoModal(Modal):
         }
 
         submissions.append(submission)
-        with open("submissions.json", "w") as f:
+        with open("campaign-ui/campaign-ui/submissions.json", "r") as f:
             json.dump(submissions, f, indent=2)
 
         # Channel finden & bestätigen
@@ -716,7 +716,7 @@ class SubmissionReviewView(View):
         for s in subs:
             if s["user_id"] == self.submission["user_id"] and s["platform"] == self.submission["platform"]:
                 s["status"] = "approved"
-        with open("submissions.json", "w") as f:
+        with open("campaign-ui/campaign-ui/submissions.json", "r") as f:
             json.dump(subs, f, indent=2)
 
         await interaction.followup.send(f"{user.mention} has been accepted.")
@@ -745,7 +745,7 @@ class SubmissionReviewView(View):
                 "You’re welcome to apply again in the future with updates or new platforms."
             )
 
-        with open("submissions.json", "r") as f:
+        with open("campaign-ui/campaign-ui/submissions.json", "r") as f:
             subs = json.load(f)
         subs = [
             s for s in subs
@@ -754,7 +754,7 @@ class SubmissionReviewView(View):
                 s["platform"] == self.submission["platform"]
             )
         ]
-        with open("submissions.json", "w") as f:
+        with open("campaign-ui/campaign-ui/submissions.json", "r") as f:
             json.dump(subs, f, indent=2)
 
         class DeleteView(View):
@@ -796,7 +796,7 @@ async def review_submissions(interaction: discord.Interaction):
     await interaction.response.defer(ephemeral=False)
 
     try:
-        with open("submissions.json", "r") as f:
+        with open("campaign-ui/campaign-ui/submissions.json", "r") as f:
             subs = json.load(f)
     except:
         subs = []
@@ -1041,7 +1041,7 @@ class CampaignCreatorView(View):
 
         # --- Daten laden: alle approved Creator -----------
         try:
-            with open("submissions.json", "r") as f:
+            with open("campaign-ui/campaign-ui/submissions.json", "r") as f:
                 subs = json.load(f)
         except:
             subs = []
@@ -1357,7 +1357,7 @@ async def check_for_expired_responses():
 @tasks.loop(seconds=10)  # für produktiv: auf 3600 (1 Stunde) setzen
 async def auto_decline_expired():
     print("[Auto-Decline] Checking for expired campaigns...")
-    data = load_json("submissions.json")
+    data = load_json("campaign-ui/campaign-ui/submissions.json")
 
     if isinstance(data, list):
         for entry in data:
