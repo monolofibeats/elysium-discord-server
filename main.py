@@ -45,9 +45,9 @@ def load_campaign_responses():
 
 def get_submission_by_id(submissions, user_id):
     for sub in submissions:
-        if sub["user_id"] == user_id:
+        if sub["id"] == user_id:
             return sub
-    return {}
+    return None
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_BOT_TOKEN")
