@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Creator Picker</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="icon" href="data:,">
+    <style>
+      :root {
+        --discord-dark: #1e1f22;
+        --discord-darker: #2b2d31;
+        --discord-accent: #5865f2;
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        background-color: var(--discord-accent);
+      }
+      input[type="range"] {
+        accent-color: var(--discord-accent);
+      }
+      select:focus, input:focus, textarea:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px var(--discord-accent);
+      }
+      .bg-discord {
+        background-color: var(--discord-accent);
+      }
+      .text-discord {
+        color: var(--discord-accent);
+      }
+    </style>
+  </head>
+  <body class="bg-[#1e1f22] text-white p-6 font-sans">
+    <div id="filter-bar" class="flex flex-wrap gap-4 mb-6">
+      <div class="flex gap-2 items-center">
+        <button id="clearFilters" class="bg-[#444] px-3 py-1 rounded text-white">
+  ❌ Clear Filters
+</button>
+        <label><input type="checkbox" value="TikTok" class="platform-filter" /> TikTok</label>
+        <label><input type="checkbox" value="Instagram" class="platform-filter" /> Instagram</label>
+        <label><input type="checkbox" value="YouTube" class="platform-filter" /> YouTube</label>
+        <label><input type="checkbox" value="Spotify" class="platform-filter" /> Spotify</label>
+      </div>
+      <select multiple id="genreSelect" class="bg-[#2b2d31] text-white p-1 rounded">
+        <option value="LoFi">LoFi</option>
+        <option value="Comedy">Comedy</option>
+        <option value="Beauty">Beauty</option>
+        <option value="Gaming">Gaming</option>
+        <option value="Vlogs">Vlogs</option>
+      </select>
+<input id="maxFollowers" type="range" min="0" max="100000" step="1000" value="50000">
+<input id="maxFollowersInput" type="number" min="0" max="100000" step="1000" value="50000">
+
+<select id="genreSelect" multiple>
+  <option value="LoFi">LoFi</option>
+  <option value="Beauty">Beauty</option>
+  <option value="Comedy">Comedy</option>
+  <option value="Vlogs">Vlogs</option>
+</select>
+
+<input id="priceMin" type="range" min="0.5" max="100" step="0.5">
+<span id="priceMinVal">0.5€</span>
+
+<input id="priceMax" type="range" min="0.5" max="100" step="0.5">
+<span id="priceMaxVal">100€</span>
+
+<input id="followerMin" type="range" min="0" max="1000000" step="1000">
+<span id="followerMinVal">0</span>
+
+<input id="followerMax" type="range" min="0" max="1000000" step="1000">
+<span id="followerMaxVal">1.000.000</span>
+
+    <div id="summary" class="mt-4">
+      <p>Selected: <span id="selectedCount">0</span></p>
+      <p>Estimated Budget: <span id="totalCost">0</span>€</p>
+      <p>Estimated Reach: <span id="totalFollowers">0</span> Follower</p>
+      <p>Estimated Views: <span id="totalViews">0</span></p>
+    </div>
+
+    <input
+  id="search"
+  type="text"
+  placeholder="Search creators..."
+  class="w-full px-3 py-2 border rounded"
+/>
+
+
+    <div id="creator-wrapper" class="w-full min-h-[300px]">
+  <div id="creator-grid" class="grid grid-cols-5 gap-4"></div>
+</div>
+
+
+    <div class="flex justify-center gap-4 mt-6">
+      <button id="prevPage" class="bg-[#2b2d31] px-4 py-2 rounded">← Prev</button>
+      <span id="currentPage" class="text-sm text-gray-400">Seite 1</span>
+      <button id="nextPage" class="bg-[#2b2d31] px-4 py-2 rounded">Next →</button>
+      <div class="note-container mt-2 text-sm text-gray-400"></div>
+    </div>
+    
+
+    <section id="campaignOverview"
+             class="hidden bg-[#2b2d31] p-4 rounded mt-8 space-y-4 border border-[#444]">
+      <h2 class="text-xl font-semibold">📦 Campaign Overview</h2>
+      <p id="stats-bar" class="text-sm text-gray-300">
+        <strong>Creators:</strong> <span id="selectedCountOverview">0</span> |
+        <strong>Budget:</strong> <span id="totalCost">0</span> € |
+        <strong>Reach:</strong> <span id="totalFollowersOverview">0</span> followers |
+        <strong>Views (30d):</strong> <span id="totalViewsOverview">0</span>
+      </p>
+      <ul id="selectedCreatorsList" class="list-disc ml-5 text-sm"></ul>
+      <label class="block">
+        <span class="block font-medium mb-1">Customize Message:</span>
+        <textarea id="customMessage" rows="6"
+          class="w-full bg-[#1e1f22] text-white p-3 rounded resize-none border border-[#444] focus:outline-none focus:ring-2 focus:ring-[#00ffcc]"
+          placeholder="Hey {name}, we’d love to work with you – your content fits our campaign perfectly. Let’s collaborate!"></textarea>
+      </label>
+      <button id="startCampaignBtn"
+              class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
+        ✅ Kampagne starten
+      </button>
+    </section>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="main.js"></script>
+</body>
+  </body>
+</html>

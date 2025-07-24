@@ -1,0 +1,437 @@
+[
+  {
+    "campaign_id": "CAMP-602",
+    "creators": [
+      {
+        "id": 37,
+        "name": "Creator 37",
+        "platform": "Spotify",
+        "status": "pending"
+      },
+      {
+        "id": 38,
+        "name": "Creator 38",
+        "platform": "Instagram",
+        "status": "pending"
+      },
+      {
+        "id": 39,
+        "name": "Creator 39",
+        "platform": "Instagram",
+        "status": "accepted"
+      },
+      {
+        "id": 45,
+        "name": "Creator 45",
+        "platform": "Spotify",
+        "status": "pending"
+      }
+    ]
+  },
+  {
+    "campaign_id": "CAMP-771",
+    "creators": [
+      {
+        "id": 37,
+        "name": "Creator 37",
+        "platform": "Spotify",
+        "status": "pending"
+      },
+      {
+        "id": 38,
+        "name": "Creator 38",
+        "platform": "Instagram",
+        "status": "pending"
+      },
+      {
+        "id": 39,
+        "name": "Creator 39",
+        "platform": "Instagram",
+        "status": "accepted"
+      },
+      {
+        "id": 45,
+        "name": "Creator 45",
+        "platform": "Spotify",
+        "status": "pending"
+      }
+    ]
+  },
+  {
+    "campaign_id": "CAMP-813",
+    "creators": [
+      {
+        "id": 37,
+        "name": "Creator 37",
+        "platform": "Spotify",
+        "status": "pending"
+      },
+      {
+        "id": 38,
+        "name": "Creator 38",
+        "platform": "Instagram",
+        "status": "pending"
+      },
+      {
+        "id": 39,
+        "name": "Creator 39",
+        "platform": "Instagram",
+        "status": "accepted"
+      },
+      {
+        "id": 45,
+        "name": "Creator 45",
+        "platform": "Spotify",
+        "status": "pending"
+      }
+    ]
+  },
+  {
+    "campaign_id": "CAMP-356",
+    "creators": [
+      {
+        "id": 37,
+        "name": "Creator 37",
+        "platform": "Spotify",
+        "status": "accepted"
+      },
+      {
+        "id": 38,
+        "name": "Creator 38",
+        "platform": "Instagram",
+        "status": "declined"
+      },
+      {
+        "id": 39,
+        "name": "Creator 39",
+        "platform": "Instagram",
+        "status": "accepted"
+      },
+      {
+        "id": 45,
+        "name": "Creator 45",
+        "platform": "Spotify",
+        "status": "declined"
+      }
+    ],
+    "closed": true
+  },
+  {
+    "campaign_id": "CAMP-267",
+    "creators": [
+      {
+        "id": 37,
+        "name": "Creator 37",
+        "platform": "Spotify",
+        "status": "pending"
+      },
+      {
+        "id": 38,
+        "name": "Creator 38",
+        "platform": "Instagram",
+        "status": "pending"
+      },
+      {
+        "id": 39,
+        "name": "Creator 39",
+        "platform": "Instagram",
+        "status": "pending"
+      },
+      {
+        "id": 45,
+        "name": "Creator 45",
+        "platform": "Spotify",
+        "status": "accepted"
+      }
+    ]
+  },
+  {
+    "campaign_id": "CAMP-154",
+    "creators": [
+      {
+        "id": 37,
+        "name": "Creator 37",
+        "platform": "Spotify",
+        "status": "accepted"
+      },
+      {
+        "id": 38,
+        "name": "Creator 38",
+        "platform": "Instagram",
+        "status": "declined"
+      },
+      {
+        "id": 39,
+        "name": "Creator 39",
+        "platform": "Instagram",
+        "status": "accepted"
+      },
+      {
+        "id": 45,
+        "name": "Creator 45",
+        "platform": "Spotify",
+        "status": "declined"
+      }
+    ],
+    "closed": true
+  },
+  {
+    "campaign_id": "CAMP-430",
+    "creators": [
+      {
+        "id": 37,
+        "name": "Creator 37",
+        "platform": "Spotify",
+        "status": "pending"
+      },
+      {
+        "id": 38,
+        "name": "Creator 38",
+        "platform": "Instagram",
+        "status": "pending"
+      },
+      {
+        "id": 39,
+        "name": "Creator 39",
+        "platform": "Instagram",
+        "status": "pending"
+      },
+      {
+        "id": 45,
+        "name": "Creator 45",
+        "platform": "Spotify",
+        "status": "pending"
+      }
+    ]
+  },
+  {
+    "campaign_id": "CAMP-363",
+    "creators": [
+      {
+        "id": 37,
+        "name": "Creator 37",
+        "platform": "Spotify",
+        "status": "accepted"
+      },
+      {
+        "id": 38,
+        "name": "Creator 38",
+        "platform": "Instagram",
+        "status": "declined"
+      },
+      {
+        "id": 39,
+        "name": "Creator 39",
+        "platform": "Instagram",
+        "status": "accepted"
+      },
+      {
+        "id": 45,
+        "name": "Creator 45",
+        "platform": "Spotify",
+        "status": "declined"
+      }
+    ],
+    "closed": true
+  },
+  {
+    "campaign_id": "CAMP-967",
+    "creators": [
+      {
+        "id": 37,
+        "name": "Creator 37",
+        "platform": "Spotify",
+        "status": "accepted"
+      },
+      {
+        "id": 38,
+        "name": "Creator 38",
+        "platform": "Instagram",
+        "status": "declined"
+      },
+      {
+        "id": 39,
+        "name": "Creator 39",
+        "platform": "Instagram",
+        "status": "accepted"
+      },
+      {
+        "id": 45,
+        "name": "Creator 45",
+        "platform": "Spotify",
+        "status": "declined"
+      }
+    ],
+    "closed": true
+  },
+  {
+    "campaign_id": "CAMP-967",
+    "creators": [
+      {
+        "id": 37,
+        "name": "Creator 37",
+        "platform": "Spotify",
+        "status": "accepted"
+      },
+      {
+        "id": 38,
+        "name": "Creator 38",
+        "platform": "Instagram",
+        "status": "declined"
+      },
+      {
+        "id": 39,
+        "name": "Creator 39",
+        "platform": "Instagram",
+        "status": "accepted"
+      },
+      {
+        "id": 45,
+        "name": "Creator 45",
+        "platform": "Spotify",
+        "status": "declined"
+      }
+    ],
+    "closed": true
+  },
+  {
+    "campaign_id": "CAMP-288",
+    "creators": [
+      {
+        "id": 45,
+        "name": "Creator 45",
+        "platform": "Spotify",
+        "status": "pending"
+      }
+    ]
+  },
+  {
+    "campaign_id": "CAMP-288",
+    "creators": [
+      {
+        "id": 45,
+        "name": "Creator 45",
+        "platform": "Spotify",
+        "status": "pending"
+      }
+    ]
+  },
+  {
+    "campaign_id": "CAMP-770",
+    "creators": [
+      {
+        "id": 45,
+        "name": "Creator 45",
+        "platform": "Spotify",
+        "status": "pending"
+      }
+    ]
+  },
+  {
+    "campaign_id": "CAMP-770",
+    "creators": [
+      {
+        "id": 45,
+        "name": "Creator 45",
+        "platform": "Spotify",
+        "status": "pending"
+      }
+    ]
+  },
+  {
+    "campaign_id": "CAMP-886",
+    "creators": [
+      {
+        "id": 45,
+        "name": "Creator 45",
+        "platform": "Spotify",
+        "status": "pending"
+      }
+    ]
+  },
+  {
+    "campaign_id": "CAMP-886",
+    "creators": [
+      {
+        "id": 45,
+        "name": "Creator 45",
+        "platform": "Spotify",
+        "status": "pending"
+      }
+    ]
+  },
+  {
+    "campaign_id": "CAMP-333",
+    "creators": [
+      {
+        "id": 45,
+        "name": "Creator 45",
+        "platform": "Spotify",
+        "status": "pending"
+      }
+    ]
+  },
+  {
+    "campaign_id": "CAMP-333",
+    "creators": [
+      {
+        "id": 45,
+        "name": "Creator 45",
+        "platform": "Spotify",
+        "status": "pending"
+      }
+    ]
+  },
+  {
+  "campaign_id": "CAMP-TEST-DEADLINE",
+  "creators": [
+    {
+      "id": 99,
+      "name": "Deadline Test Creator",
+      "platform": "TikTok",
+      "status": "pending",
+      "deadline": "2025-07-24T00:29:00.000Z"
+    }
+  ]
+},
+  {
+    "campaign_id": "CAMP-565",
+    "creators": [
+      {
+        "id": 45,
+        "name": "Creator 45",
+        "platform": "Spotify",
+        "status": "pending"
+        
+      }
+    ]
+  },
+  {
+    "campaign_id": "CAMP-294",
+    "creators": [
+      {
+        "id": 45,
+        "name": "Creator 45",
+        "platform": "Spotify",
+        "followers": 30288,
+        "followerLastMonth": 25333,
+        "followerGrowth": 19.6,
+        "views30d": 35784,
+        "viewsLastMonth": 27840,
+        "viewsGrowth": 28.5,
+        "uploadsPerWeek": 3,
+        "contentChange": "more",
+        "genres": [
+          "Beauty",
+          "Gaming"
+        ],
+        "price": 82,
+        "rating": 3,
+        "image": "https://api.dicebear.com/7.x/thumbs/svg?seed=45",
+        "link": "https://example.com/45",
+        "status": "pending",
+        "deadline": "2025-07-26T19:34:25.226319"
+      }
+    ]
+  }
+]
