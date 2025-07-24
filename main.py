@@ -433,7 +433,7 @@ class CreatorInfoModal(Modal):
         # Vorherige Einträge für diesen User + Plattform entfernen
         submissions = [
             s for s in submissions
-            if not (s["user_id"] == user.id and s["platform"] == submission_info["platform"])
+            if not (s.get("user_id") == user.id and s.get("platform") == submission_info["platform"])
         ]
 
         submission = {
