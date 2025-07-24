@@ -1321,6 +1321,7 @@ async def check_for_expired_responses():
 
     print("[Auto-Decline] Checking for expired responses...")
 
+    campaign_responses = load_campaign_responses()
     for campaign_id, creators in campaign_responses.items():
         for creator_id, response in creators.items():
             if response["status"] == "pending":
