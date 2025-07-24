@@ -15,6 +15,10 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from discord.ext import tasks
 app = FastAPI()
+from dotenv import load_dotenv
+
+load_dotenv()
+TOKEN = os.getenv("DISCORD_BOT_TOKEN")
 
 CAMPAIGN_UPDATES_CHANNEL = "campaign-updates"  # Channel für globale Updates
 CAMPAIGN_RESPONSES_FILE = os.path.join(BASE_DIR, "campaign_responses.json")
@@ -1392,3 +1396,5 @@ async def start_bot():
 
 loop = asyncio.get_event_loop()
 loop.create_task(start_bot())  # Bot läuft im Hintergrund
+
+bot.run(TOKEN)
