@@ -36,6 +36,13 @@ def load_submissions():
     with open("submissions.json", "r") as f:
         return json.load(f)
 
+def load_campaign_responses():
+    try:
+        with open("campaign-ui/campaign-ui/campaign_responses.json", "r") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return {}
+
 def get_submission_by_id(submissions, user_id):
     for sub in submissions:
         if sub["user_id"] == user_id:
