@@ -17,9 +17,6 @@ from discord.ext import tasks
 app = FastAPI()
 from dotenv import load_dotenv
 
-load_dotenv()
-TOKEN = os.getenv("DISCORD_BOT_TOKEN")
-
 CAMPAIGN_UPDATES_CHANNEL = "campaign-updates"  # Channel für globale Updates
 CAMPAIGN_RESPONSES_FILE = os.path.join(BASE_DIR, "campaign_responses.json")
 
