@@ -582,36 +582,31 @@ async def apply_command(interaction: discord.Interaction):
 
 SUBMISSIONS_PATH = os.path.join(BASE_DIR, "campaign-ui", "campaign-ui", "submissions.json")
 
-@bot.tree.command(name="verify", description="Verifiziere deinen Creator-Code")
-@app_commands.describe(code="Dein Verifizierungscode")
+@bot.tree.command(name="verify", description="Beginne den Verifizierungsprozess als Creator.")
+@app_commands.describe(code="Dein persönlicher 6-stelliger Verifizierungscode")
 async def verify_command(interaction: discord.Interaction, code: str):
-    submissions = load_json("campaign-ui/campaign-ui/submissions.json")
+    user = interaction.user
 
-    matching_submission = next((sub for sub in submissions if sub["id"] == code), None)
+    # JSON laden
+    submissions = load_json("submissions.json")
 
-    if not matching_submission:
-        await interaction.response.send_message("Ungültiger Code. Bitte überprüfe deine Eingabe.", ephemeral=True)
+    # Code suchen
+    submission = next((s for s in submissions if s.get("code") == code), None)
+    if not submission:
+        await interaction.response.send_message("❌ Code ungültig oder abgelaufen.", ephemeral=True)
         return
 
-    guild = interaction.guild
-    member = interaction.user
+    # User-ID zuweisen
+    submission["user_id"] = user.id
+    save_json("submissions.json", submissions)
 
-    verify_channel_name = f"verify-{member.name.lower()}"
+    # Temporär speichern für Modal-Submit später
+    if not hasattr(bot, "temp_submissions"):
+        bot.temp_submissions = {}
+    bot.temp_submissions[user.id] = submission
 
-    # Channel erstellen
-    overwrites = {
-        guild.default_role: discord.PermissionOverwrite(read_messages=False),
-        member: discord.PermissionOverwrite(read_messages=True, send_messages=True),
-        guild.me: discord.PermissionOverwrite(read_messages=True)
-    }
-
-    channel = await guild.create_text_channel(verify_channel_name, overwrites=overwrites, category=None)
-
-    await channel.send(f"{member.mention}, willkommen im Verifizierungsbereich!\n"
-                       f"Bitte teile hier deine Plattformdaten, Screenshots oder Links mit dem Team.\n\n"
-                       f"Ein Admin wird sich zeitnah bei dir melden.")
-
-    await interaction.response.send_message(f"Verifizierungscode akzeptiert. Dein privater Kanal: {channel.mention}", ephemeral=True)
+    # Modal anzeigen
+    await interaction.response.send_modal(CreatorInfoModal(bot))
 
     submissions = load_submissions()
     user = interaction.user
