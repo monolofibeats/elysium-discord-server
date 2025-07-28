@@ -537,8 +537,15 @@ class SubmitModal(Modal, title="Submit Campaign Result"):
 async def on_ready():
     print(f"Bot ist online als {bot.user}")
     try:
-        synced = await bot.tree.sync()
-        print(f"Synced {len(synced)} command(s)")
+        await bot.tree.sync()
+        print("Synced slash commands.")
+        
+        # ❗ FORCE-RESET ALL GLOBAL COMMANDS (nur einmal nötig!)
+        # Löscht alle Slash-Commands von Discord und registriert neu
+        guilds = await bot.fetch_guilds().flatten()
+        for guild in guilds:
+            await bot.tree.sync(guild=guild)
+            print(f"Force-synced for guild: {guild.name}")
     except Exception as e:
         print(f"Command Sync Error: {e}")
 
