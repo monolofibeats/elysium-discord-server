@@ -590,42 +590,53 @@ async def apply_command(interaction: discord.Interaction):
 
     await interaction.response.send_message("✅ Your private verification channel has been created.", ephemeral=True)
 
-@bot.tree.command(name="verify", description="Verify your account by entering your code.")
-@app_commands.describe(code="The verification code you were given")
-async def verify_command(interaction: discord.Interaction, code: str):
+@bot.tree.command(name="verify", description="Beginne den Verifizierungsprozess.")
+@app_commands.describe(platform="Auf welcher Plattform hast du gepostet?")
+async def verify_command(interaction: discord.Interaction, platform: str):
     await interaction.response.defer(ephemeral=True)
 
+    user_id = str(interaction.user.id)
+    submissions = load_json(SUBMISSIONS_PATH)
+
+    # Submission für den User finden
+    user_sub = get_submission_by_id(submissions, user_id)
+
+    if not user_sub:
+        await interaction.followup.send("❌ Du hast noch keine Bewerbung eingereicht.")
+        return
+
+    if not user_sub.get("details"):
+        await interaction.followup.send("❌ Bitte fülle zuerst alle Creator-Infos aus.")
+        return
+
+    if user_sub.get("verified"):
+        await interaction.followup.send("✅ Du bist bereits verifiziert.")
+        return
+
+    # Scraper + Prüfung auf Code in Bio
     try:
-        user_id = interaction.user.id
-        submissions = load_submissions()
-        user_sub = get_submission_by_id(submissions, user_id)
-
-        if not user_sub:
-            await interaction.followup.send("You don't have an active submission.")
+        username = user_sub.get("username")
+        if not username:
+            await interaction.followup.send("❌ Kein Username gefunden.")
             return
 
-        if not user_sub.get("details"):
-            await interaction.followup.send("You're not at the correct step yet.")
+        platform_url = get_platform_url(platform, username)
+        if not platform_url:
+            await interaction.followup.send("❌ Ungültige Plattform oder URL konnte nicht generiert werden.")
             return
 
-        # Bio auslesen
-        platform = user_sub["platform"]
-        username = user_sub["username"]
-        bio = await fetch_bio(platform, username)
+        code = user_sub.get("code", "").lower()
+        bio = await scrape_bio(platform_url, platform)
 
-        if code.lower() not in bio.lower():
-            await interaction.followup.send("Verification failed. Please make sure your code is in your bio.")
-            return
+        if code in bio.lower():
+            user_sub["verified"] = True
+            save_json(SUBMISSIONS_PATH, submissions)
+            await interaction.followup.send("✅ Verifizierung erfolgreich! Willkommen im Creator-Netzwerk.")
+        else:
+            await interaction.followup.send("❌ Verifizierung fehlgeschlagen. Der Code ist nicht in deiner Bio.")
 
-        # Erfolg
-        user_sub["verified"] = True
-        save_submissions(submissions)
-
-        await interaction.followup.send("✅ Verification successful!")
     except Exception as e:
-        print(f"[ERROR /verify] {e}")
-        await interaction.followup.send("An error occurred during verification.")
-
+        await interaction.followup.send(f"❌ Fehler bei der Verifizierung: {e}")
 
     submissions = load_submissions()
     user = interaction.user
