@@ -591,7 +591,7 @@ async def apply_command(interaction: discord.Interaction):
 
 SUBMISSIONS_PATH = os.path.join(BASE_DIR, "campaign-ui", "campaign-ui", "submissions.json")
 
-@bot.tree.command(name="verify", description="Gib deinen Code ein.")
+@bot.tree.command(name="verify2", description="Gib deinen Code ein.")
 @app_commands.describe(code="Der 5-stellige Verifizierungscode")
 async def verify(interaction: discord.Interaction, code: str):
     try:
