@@ -535,13 +535,12 @@ class SubmitModal(Modal, title="Submit Campaign Result"):
 
 @bot.event
 async def on_ready():
-    await bot.wait_until_ready()
+    print(f"Bot ist online als {bot.user}")
     try:
         synced = await bot.tree.sync()
-        print(f"Synced {len(synced)} slash command(s).")
+        print(f"Synced {len(synced)} command(s)")
     except Exception as e:
-        print(f"Error syncing commands: {e}")
-    print(f"Jake is online as {bot.user}")
+        print(f"Command Sync Error: {e}")
 
 @app.on_event("startup")
 async def start_background_tasks():
