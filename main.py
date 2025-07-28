@@ -582,36 +582,36 @@ async def apply_command(interaction: discord.Interaction):
 
 SUBMISSIONS_PATH = os.path.join(BASE_DIR, "campaign-ui", "campaign-ui", "submissions.json")
 
-@bot.tree.command(name="verify", description="Gib deinen Code ein.")
-@app_commands.describe(code="Der 5-stellige Verifizierungscode")
-async def verify(interaction: discord.Interaction, code: str):
-    try:
-        submissions = load_json("campaign-ui/campaign-ui/submissions.json")
-        user_id = str(interaction.user.id)
-        user_sub = next((sub for sub in submissions if sub.get("id") == code), None)
+@bot.tree.command(name="verify", description="Verifiziere deinen Creator-Code")
+@app_commands.describe(code="Dein Verifizierungscode")
+async def verify_command(interaction: discord.Interaction, code: str):
+    submissions = load_json("campaign-ui/campaign-ui/submissions.json")
 
-        if not user_sub:
-            await interaction.response.send_message("❌ Code nicht gefunden. Bitte prüfe deine Eingabe.", ephemeral=True)
-            return
+    matching_submission = next((sub for sub in submissions if sub["id"] == code), None)
 
-        user_sub["user_id"] = user_id
-        save_json("campaign-ui/campaign-ui/submissions.json", submissions)
+    if not matching_submission:
+        await interaction.response.send_message("Ungültiger Code. Bitte überprüfe deine Eingabe.", ephemeral=True)
+        return
 
-        await interaction.response.send_message("✅ Du wurdest erfolgreich verifiziert!", ephemeral=True)
+    guild = interaction.guild
+    member = interaction.user
 
-        verify_channel = await interaction.guild.create_text_channel(
-            name=f"verify-{interaction.user.name.lower()}",
-            topic=f"Verifizierung von {interaction.user.name}",
-            overwrites={
-                interaction.guild.default_role: discord.PermissionOverwrite(read_messages=False),
-                interaction.user: discord.PermissionOverwrite(read_messages=True, send_messages=True)
-            }
-        )
+    verify_channel_name = f"verify-{member.name.lower()}"
 
-        await verify_channel.send(f"{interaction.user.mention} wurde verifiziert.\nPlattform: `{user_sub.get('platform', 'unbekannt')}`\nLink: {user_sub.get('link', 'kein Link eingetragen')}")
-    except Exception as e:
-        await interaction.response.send_message("❌ Ein Fehler ist aufgetreten. Bitte kontaktiere ein Admin-Team.", ephemeral=True)
-        print(f"[verify] Fehler: {e}")
+    # Channel erstellen
+    overwrites = {
+        guild.default_role: discord.PermissionOverwrite(read_messages=False),
+        member: discord.PermissionOverwrite(read_messages=True, send_messages=True),
+        guild.me: discord.PermissionOverwrite(read_messages=True)
+    }
+
+    channel = await guild.create_text_channel(verify_channel_name, overwrites=overwrites, category=None)
+
+    await channel.send(f"{member.mention}, willkommen im Verifizierungsbereich!\n"
+                       f"Bitte teile hier deine Plattformdaten, Screenshots oder Links mit dem Team.\n\n"
+                       f"Ein Admin wird sich zeitnah bei dir melden.")
+
+    await interaction.response.send_message(f"Verifizierungscode akzeptiert. Dein privater Kanal: {channel.mention}", ephemeral=True)
 
     submissions = load_submissions()
     user = interaction.user
