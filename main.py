@@ -582,34 +582,40 @@ async def apply_command(interaction: discord.Interaction):
 
 SUBMISSIONS_PATH = os.path.join(BASE_DIR, "campaign-ui", "campaign-ui", "submissions.json")
 
-@bot.tree.command(name="verify", description="Start the verification process")
-@app_commands.describe(platform="Your main platform (e.g. TikTok, Instagram)", username="Your @username on that platform")
+(name="verify", description="Verify your social profile by code")
+@app_commands.describe(
+    platform="Platform (TikTok, Instagram, YouTube, Spotify)",
+    username="Your username or playlist ID"
+)
 async def verify_command(interaction: discord.Interaction, platform: str, username: str):
+    submissions = load_submissions()
     user = interaction.user
-    submissions = load_json("submissions.json")
+    code = verification_codes.get(user.id)@bot.tree.command
 
-    # Suche Eintrag ohne user_id, aber mit passender Plattform und Username
-    matching_submission = next(
-        (s for s in submissions if s.get("platform", "").lower() == platform.lower()
-         and s.get("username", "").lower() == username.lower()
-         and not s.get("user_id")), None)
+    user_id = str(interaction.user.id)
+    user_sub = get_submission_by_id(submissions, user_id)
 
-    if not matching_submission:
-        await interaction.response.send_message("⚠️ No submission data found. Please use /verify only after submitting your code in the form.", ephemeral=True)
-        return
+    # Speichere temp Submission
+    bot.temp_submissions[user.id] = {
+        "platform": platform,
+        "username": username,
+        "bio": "N/A",  # Optional, kannst du später ersetzen
+        "code": code,
+    }
 
-    # Speichere user_id
-    matching_submission["user_id"] = user.id
-    save_json("submissions.json", submissions)
-
-    # Temporär speichern für Modal später
-    if not hasattr(bot, "temp_submissions"):
-        bot.temp_submissions = {}
-    bot.temp_submissions[user.id] = matching_submission
-
-    # Modal anzeigen
-    await interaction.response.send_modal(CreatorInfoModal(bot))
-
+    if not user_sub.get("details"):
+        await interaction.response.send_message(
+            content=(
+                "**⚠️ Final Warning – Read Carefully!**\n\n"
+                "By continuing, you confirm that the information you’re about to provide is **truthful**.\n"
+                "**Any attempt to manipulate views, follower stats, or pricing will result in a permanent ban** and full denial of payment.\n\n"
+                "If you're unsure, please **cancel** now and contact support first."
+            ),
+            view=RiskAgreementView(bot),
+            ephemeral=True
+        )
+        return  # WICHTIG: sonst läuft es unten weiter
+        
     submissions = load_submissions()
     user = interaction.user
     code = verification_codes.get(user.id)
