@@ -590,45 +590,42 @@ async def apply_command(interaction: discord.Interaction):
 
     await interaction.response.send_message("✅ Your private verification channel has been created.", ephemeral=True)
 
-def check_code_in_bio(user: discord.Member, code: str) -> bool:
+@bot.tree.command(name="verify", description="Verify your account by entering your code.")
+@app_commands.describe(code="The verification code you were given")
+async def verify_command(interaction: discord.Interaction, code: str):
+    await interaction.response.defer(ephemeral=True)
+
     try:
-        if user is None:
-            return False
+        user_id = interaction.user.id
+        submissions = load_submissions()
+        user_sub = get_submission_by_id(submissions, user_id)
 
-        bio = user.global_name or ""
-        about_me = user._user.bio if hasattr(user._user, "bio") else ""
+        if not user_sub:
+            await interaction.followup.send("You don't have an active submission.")
+            return
 
-        return code in bio or code in about_me
+        if not user_sub.get("details"):
+            await interaction.followup.send("You're not at the correct step yet.")
+            return
+
+        # Bio auslesen
+        platform = user_sub["platform"]
+        username = user_sub["username"]
+        bio = await fetch_bio(platform, username)
+
+        if code.lower() not in bio.lower():
+            await interaction.followup.send("Verification failed. Please make sure your code is in your bio.")
+            return
+
+        # Erfolg
+        user_sub["verified"] = True
+        save_submissions(submissions)
+
+        await interaction.followup.send("✅ Verification successful!")
     except Exception as e:
-        print(f"[Error] Checking bio failed: {e}")
-        return False
+        print(f"[ERROR /verify] {e}")
+        await interaction.followup.send("An error occurred during verification.")
 
-@bot.tree.command(name="verify", description="Verify your social profile by code")
-@app_commands.describe(
-    platform="Platform (TikTok, Instagram, YouTube, Spotify)",
-    username="Your username or playlist ID"
-)
-async def verify_command(interaction: discord.Interaction, platform: str, username: str):
-try:
-    user_id = interaction.user.id
-    verify_code = f"vibe-{user_id}"
-
-    # Discord User-Fetch
-    fetched_user = await bot.fetch_user(user_id)
-    if verify_code not in (fetched_user.bio or "") and verify_code not in (fetched_user.global_name or ""):
-        await interaction.response.send_message(
-            "❌ Dein Verifizierungscode wurde nicht in deiner Bio oder Beschreibung gefunden. "
-            "Bitte füge den Code dort ein und versuche es erneut.",
-            ephemeral=True
-        )
-        return
-except Exception as e:
-    print("[Verify] Fehler beim Code-Abgleich:", e)
-    await interaction.response.send_message(
-        "⚠️ Beim Überprüfen deines Codes ist ein Fehler aufgetreten. Versuche es später erneut.",
-        ephemeral=True
-    )
-    return
 
     submissions = load_submissions()
     user = interaction.user
