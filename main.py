@@ -60,15 +60,6 @@ bot = commands.Bot(command_prefix="/", intents=intents)
 bot.temp_submissions = {}
 verification_codes = {}
 
-@bot.event
-async def on_ready():
-    print(f"Bot ist online als {bot.user}")
-    try:
-        synced = await bot.tree.sync(force=True)
-        print(f"[SYNC] Commands resynced: {[cmd.name for cmd in synced]}")
-    except Exception as e:
-        print(f"[SYNC ERROR] {e}")
-
 def make_creator_callback(creator_id, creator_name):
     async def button_callback(interaction: discord.Interaction):
         if "selected_creators" not in bot.temp_campaign_data:
@@ -1420,6 +1411,15 @@ async def on_ready():
 async def on_ready():
     print(f"Bot ist online als {bot.user}")
     check_for_expired_responses.start()
+
+@bot.event
+async def on_ready():
+    print(f"Bot ist online als {bot.user}")
+    try:
+        synced = await bot.tree.sync()
+        print(f"[Slash Commands] {len(synced)} Command(s) synchronisiert.")
+    except Exception as e:
+        print(f"[Slash Commands] Fehler bei sync: {e}")
 
 # Starte Bot in Hintergrund-Task
 async def start_bot():
