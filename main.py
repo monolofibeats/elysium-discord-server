@@ -60,6 +60,15 @@ bot = commands.Bot(command_prefix="/", intents=intents)
 bot.temp_submissions = {}
 verification_codes = {}
 
+@bot.event
+async def on_ready():
+    print(f"Bot ist online als {bot.user}")
+    try:
+        synced = await bot.tree.sync(force=True)
+        print(f"[SYNC] Commands resynced: {[cmd.name for cmd in synced]}")
+    except Exception as e:
+        print(f"[SYNC ERROR] {e}")
+
 def make_creator_callback(creator_id, creator_name):
     async def button_callback(interaction: discord.Interaction):
         if "selected_creators" not in bot.temp_campaign_data:
@@ -532,22 +541,6 @@ class SubmitModal(Modal, title="Submit Campaign Result"):
     @discord.ui.button(label="📎 Submit", style=discord.ButtonStyle.green)
     async def submit(self, interaction: discord.Interaction, button: Button):
         await interaction.response.send_modal(SubmitModal(self.campaign_name))
-
-@bot.event
-async def on_ready():
-    print(f"Bot ist online als {bot.user}")
-    try:
-        await bot.tree.sync()
-        print("Synced slash commands.")
-        
-        # ❗ FORCE-RESET ALL GLOBAL COMMANDS (nur einmal nötig!)
-        # Löscht alle Slash-Commands von Discord und registriert neu
-        guilds = await bot.fetch_guilds().flatten()
-        for guild in guilds:
-            await bot.tree.sync(guild=guild)
-            print(f"Force-synced for guild: {guild.name}")
-    except Exception as e:
-        print(f"Command Sync Error: {e}")
 
 @app.on_event("startup")
 async def start_background_tasks():
