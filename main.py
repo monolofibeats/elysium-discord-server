@@ -596,6 +596,27 @@ async def apply_command(interaction: discord.Interaction):
     username="Your username or playlist ID"
 )
 async def verify_command(interaction: discord.Interaction, platform: str, username: str):
+try:
+    user_id = interaction.user.id
+    verify_code = f"vibe-{user_id}"
+
+    # Discord User-Fetch
+    fetched_user = await bot.fetch_user(user_id)
+    if verify_code not in (fetched_user.bio or "") and verify_code not in (fetched_user.global_name or ""):
+        await interaction.response.send_message(
+            "❌ Dein Verifizierungscode wurde nicht in deiner Bio oder Beschreibung gefunden. "
+            "Bitte füge den Code dort ein und versuche es erneut.",
+            ephemeral=True
+        )
+        return
+except Exception as e:
+    print("[Verify] Fehler beim Code-Abgleich:", e)
+    await interaction.response.send_message(
+        "⚠️ Beim Überprüfen deines Codes ist ein Fehler aufgetreten. Versuche es später erneut.",
+        ephemeral=True
+    )
+    return
+
     submissions = load_submissions()
     user = interaction.user
     code = verification_codes.get(user.id)
