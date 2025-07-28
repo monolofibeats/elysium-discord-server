@@ -582,28 +582,30 @@ async def apply_command(interaction: discord.Interaction):
 
 SUBMISSIONS_PATH = os.path.join(BASE_DIR, "campaign-ui", "campaign-ui", "submissions.json")
 
-@bot.tree.command(name="verify", description="Beginne den Verifizierungsprozess als Creator.")
-@app_commands.describe(code="Dein persönlicher 6-stelliger Verifizierungscode")
-async def verify_command(interaction: discord.Interaction, code: str):
+@bot.tree.command(name="verify", description="Start the verification process")
+@app_commands.describe(platform="Your main platform (e.g. TikTok, Instagram)", username="Your @username on that platform")
+async def verify_command(interaction: discord.Interaction, platform: str, username: str):
     user = interaction.user
-
-    # JSON laden
     submissions = load_json("submissions.json")
 
-    # Code suchen
-    submission = next((s for s in submissions if s.get("code") == code), None)
-    if not submission:
-        await interaction.response.send_message("❌ Code ungültig oder abgelaufen.", ephemeral=True)
+    # Suche Eintrag ohne user_id, aber mit passender Plattform und Username
+    matching_submission = next(
+        (s for s in submissions if s.get("platform", "").lower() == platform.lower()
+         and s.get("username", "").lower() == username.lower()
+         and not s.get("user_id")), None)
+
+    if not matching_submission:
+        await interaction.response.send_message("⚠️ No submission data found. Please use /verify only after submitting your code in the form.", ephemeral=True)
         return
 
-    # User-ID zuweisen
-    submission["user_id"] = user.id
+    # Speichere user_id
+    matching_submission["user_id"] = user.id
     save_json("submissions.json", submissions)
 
-    # Temporär speichern für Modal-Submit später
+    # Temporär speichern für Modal später
     if not hasattr(bot, "temp_submissions"):
         bot.temp_submissions = {}
-    bot.temp_submissions[user.id] = submission
+    bot.temp_submissions[user.id] = matching_submission
 
     # Modal anzeigen
     await interaction.response.send_modal(CreatorInfoModal(bot))
