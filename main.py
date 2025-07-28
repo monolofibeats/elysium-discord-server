@@ -590,6 +590,19 @@ async def apply_command(interaction: discord.Interaction):
 
     await interaction.response.send_message("✅ Your private verification channel has been created.", ephemeral=True)
 
+def check_code_in_bio(user: discord.Member, code: str) -> bool:
+    try:
+        if user is None:
+            return False
+
+        bio = user.global_name or ""
+        about_me = user._user.bio if hasattr(user._user, "bio") else ""
+
+        return code in bio or code in about_me
+    except Exception as e:
+        print(f"[Error] Checking bio failed: {e}")
+        return False
+
 @bot.tree.command(name="verify", description="Verify your social profile by code")
 @app_commands.describe(
     platform="Platform (TikTok, Instagram, YouTube, Spotify)",
