@@ -598,30 +598,36 @@ async def apply_command(interaction: discord.Interaction):
 
 SUBMISSIONS_PATH = os.path.join(BASE_DIR, "campaign-ui", "campaign-ui", "submissions.json")
 
-@bot.tree.command(name="verify", description="Verifies a creator based on their submission code")
-@app_commands.describe(code="The code they placed in their TikTok/YouTube/Instagram bio/description")
-async def verify_command(interaction: discord.Interaction, code: str):
-    await interaction.response.defer(ephemeral=True)
+@bot.tree.command(name="verify", description="Gib deinen Code ein.")
+@app_commands.describe(code="Der 5-stellige Verifizierungscode")
+async def verify(interaction: discord.Interaction, code: str):
+    try:
+        submissions = load_json("campaign-ui/campaign-ui/submissions.json")
+        user_id = str(interaction.user.id)
+        user_sub = next((sub for sub in submissions if sub.get("id") == code), None)
 
-    submissions = load_json(SUBMISSIONS_PATH)
-    user_sub = next((s for s in submissions if s.get("id") == code), None)
+        if not user_sub:
+            await interaction.response.send_message("❌ Code nicht gefunden. Bitte prüfe deine Eingabe.", ephemeral=True)
+            return
 
-    if not user_sub:
-        await interaction.followup.send("❌ Code not found. Please check the code and try again.")
-        return
+        user_sub["user_id"] = user_id
+        save_json("campaign-ui/campaign-ui/submissions.json", submissions)
 
-    if not user_sub.get("details"):
-        await interaction.followup.send("⚠️ This code is valid, but the creator hasn’t submitted their details yet.")
-        return
+        await interaction.response.send_message("✅ Du wurdest erfolgreich verifiziert!", ephemeral=True)
 
-    # Hier kannst du auch eine zusätzliche Prüfung machen (z. B. ob bio überprüft wurde)
-    # Optional: Logik zur Prüfung des Codes in TikTok/IG-Bio könnte folgen
+        verify_channel = await interaction.guild.create_text_channel(
+            name=f"verify-{interaction.user.name.lower()}",
+            topic=f"Verifizierung von {interaction.user.name}",
+            overwrites={
+                interaction.guild.default_role: discord.PermissionOverwrite(read_messages=False),
+                interaction.user: discord.PermissionOverwrite(read_messages=True, send_messages=True)
+            }
+        )
 
-    await interaction.followup.send("✅ Code is valid! Now collecting additional creator details...")
-
-    # Modal anzeigen zur weiteren Info-Eingabe
-    modal = CreatorInfoModal(user_id=interaction.user.id, submission_code=code)
-    await interaction.response.send_modal(modal)
+        await verify_channel.send(f"{interaction.user.mention} wurde verifiziert.\nPlattform: `{user_sub.get('platform', 'unbekannt')}`\nLink: {user_sub.get('link', 'kein Link eingetragen')}")
+    except Exception as e:
+        await interaction.response.send_message("❌ Ein Fehler ist aufgetreten. Bitte kontaktiere ein Admin-Team.", ephemeral=True)
+        print(f"[verify] Fehler: {e}")
 
     submissions = load_submissions()
     user = interaction.user
