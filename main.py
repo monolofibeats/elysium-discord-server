@@ -588,6 +588,11 @@ SUBMISSIONS_PATH = os.path.join(BASE_DIR, "campaign-ui", "campaign-ui", "submiss
     username="Your username or playlist ID"
 )
 async def verify_command(interaction: discord.Interaction, platform: str, username: str):
+    from tiktok_scraper import get_tiktok_bio
+    from instagram_scraper import get_instagram_bio
+    from youtube_scraper import get_youtube_description
+    from spotify_scraper import get_playlist_description
+
     user = interaction.user
     user_id = user.id
     code = verification_codes.get(user.id)
@@ -599,71 +604,50 @@ async def verify_command(interaction: discord.Interaction, platform: str, userna
         )
         return
 
-    # Profil-URL bauen
-    url = {
-        "tiktok": f"https://www.tiktok.com/@{username}",
-        "instagram": f"https://www.instagram.com/{username}",
-        "youtube": f"https://www.youtube.com/@{username}",
-        "spotify": f"https://open.spotify.com/playlist/{username}"
-    }.get(platform.lower())
+    await interaction.response.defer(ephemeral=True)
+    platform = platform.lower()
+    bio = None
 
-    if not url:
-        await interaction.response.send_message("❌ Unbekannte Plattform. Bitte wähle TikTok, Instagram, YouTube oder Spotify.", ephemeral=True)
-        return
-
-    # Profil-HTML abrufen
     try:
-        import aiohttp
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as resp:
-                html = await resp.text()
+        if platform == "tiktok":
+            bio = await get_tiktok_bio(username)
+        elif platform == "instagram":
+            bio = await get_instagram_bio(username)
+        elif platform == "youtube":
+            bio = await get_youtube_description(username)
+        elif platform == "spotify":
+            bio = await get_playlist_description(username)
+        else:
+            await interaction.followup.send("❌ Unbekannte Plattform. Bitte wähle TikTok, Instagram, YouTube oder Spotify.")
+            return
     except Exception as e:
-        await interaction.response.send_message(f"⚠️ Fehler beim Abrufen des Profils: {e}", ephemeral=True)
+        await interaction.followup.send(f"⚠️ Fehler beim Scraping des Profils: {e}")
         return
 
-    # Codeprüfung im HTML
-    if code not in html:
-        await interaction.response.send_message(
+    if not bio or code.lower() not in bio.lower():
+        await interaction.followup.send(
             f"❌ Dein Code `{code}` wurde auf dem Profil **nicht gefunden**.\n"
             f"Bitte stelle sicher, dass er sichtbar in deiner Bio oder Beschreibung steht.",
-            ephemeral=True
         )
         return
 
-    # ✅ Alles korrekt → Temp Submission speichern
+    # ✅ Code wurde gefunden → Speichere Temp Submission
     bot.temp_submissions[user.id] = {
         "platform": platform,
         "username": username,
-        "bio": "N/A",  # Wird evtl. später noch ausgelesen
+        "bio": bio,
         "code": code
     }
 
-    # ⚠️ Final Warning anzeigen
-    await interaction.response.send_message(
+    await interaction.followup.send(
         content=(
             "**⚠️ Final Warning – Read Carefully!**\n\n"
             "By continuing, you confirm that the information you’re about to provide is **truthful**.\n"
             "**Any attempt to manipulate views, follower stats, or pricing will result in a permanent ban** and full denial of payment.\n\n"
             "If you're unsure, please **cancel** now and contact support first."
         ),
-        view=RiskAgreementView(bot),
-        ephemeral=True
+        view=RiskAgreementView(bot)
     )
-    
-    # ✅ Wenn bereits Details existieren, nur Channel-Nachricht senden
-    verify_channel = next((c for c in interaction.guild.text_channels if c.topic == code[1:]), None)
-    if verify_channel:
-        await verify_channel.send(
-            f"{user.mention}, your code was successfully found.\n\n"
-            "Please answer a few more questions to complete your application.\n\n"
-            "### ⚠️ Warning – be honest:\n"
-            "All information you submit must be truthful and based on your actual content performance.\n"
-            "If we detect false data, misleading claims, or inflated numbers:\n\n"
-            "* You will be permanently banned from the Elysium network\n"
-            "* You will be removed from all Discord systems and future campaigns\n"
-            "* We reserve the right to withhold any earned revenue or pending payouts\n\n"
-            "This includes fake follower counts, made-up prices, and manipulated stats."
-        )
         
 class SubmissionReviewView(View):
     def __init__(self, bot, submission):
