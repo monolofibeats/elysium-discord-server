@@ -583,59 +583,28 @@ async def apply_command(interaction: discord.Interaction):
 SUBMISSIONS_PATH = os.path.join(BASE_DIR, "campaign-ui", "campaign-ui", "submissions.json")
 
 @bot.tree.command(name="verify", description="Verify your social profile by code")
-@app_commands.describe(code="The verification code you received")
-async def verify(interaction: discord.Interaction, code: str):
-    with open("campaign-ui/submissions.json", "r", encoding="utf-8") as f:
-        data = json.load(f)
-
-    submission = next((s for s in data if s.get("code") == code), None)
-
-    if submission is None:
-        await interaction.response.send_message(
-            "❌ Kein gültiger Code gefunden. Bitte überprüfe deine Eingabe.",
-            ephemeral=True
-        )
-        return
-
-    # Berechne den Channel-Namen auf Basis von Username + Plattform
-    username = submission.get("username", "unknown").lower().replace(" ", "-")
-    platform = submission.get("platform", "platform").lower()
-    channel_name = f"t-creator-{username}-{platform}"
-
-    # Erstelle privaten Channel
-    guild = interaction.guild
-    overwrites = {
-        guild.default_role: discord.PermissionOverwrite(view_channel=False),
-        interaction.user: discord.PermissionOverwrite(view_channel=True),
-        guild.me: discord.PermissionOverwrite(view_channel=True),
-    }
-    verify_channel = await guild.create_text_channel(channel_name, overwrites=overwrites, category=None)
-
-    await interaction.response.send_message(
-        f"✅ Verifizierung erfolgreich! Du wurdest freigeschaltet.",
-        ephemeral=True
-    )
-
-    await verify_channel.send(
-        f"{interaction.user.mention} wurde über den Code `{code}` verifiziert und ist jetzt freigeschaltet."
-    )
-        
+@app_commands.describe(
+    platform="Platform (TikTok, Instagram, YouTube, Spotify)",
+    username="Your username or playlist ID"
+)
+async def verify_command(interaction: discord.Interaction, platform: str, username: str):
     submissions = load_submissions()
     user = interaction.user
     code = verification_codes.get(user.id)
 
-    user_id = str(interaction.user.id)
+    user_id = str(user.id)
     user_sub = get_submission_by_id(submissions, user_id)
 
-    # Speichere temp Submission
+    # Speichere temporäre Submission (für spätere Modals etc.)
     bot.temp_submissions[user.id] = {
         "platform": platform,
         "username": username,
-        "bio": "N/A",  # Optional, kannst du später ersetzen
+        "bio": "N/A",  # Kann später durch Scraper oder Modal ersetzt werden
         "code": code,
     }
 
-    if not user_sub or not user_sub.get("details"):
+    # Wenn noch keine Details vorhanden → Risiko-Warnung + Button
+    if not user_sub.get("details"):
         await interaction.response.send_message(
             content=(
                 "**⚠️ Final Warning – Read Carefully!**\n\n"
@@ -643,12 +612,12 @@ async def verify(interaction: discord.Interaction, code: str):
                 "**Any attempt to manipulate views, follower stats, or pricing will result in a permanent ban** and full denial of payment.\n\n"
                 "If you're unsure, please **cancel** now and contact support first."
             ),
-            view=RiskAgreementView(bot),
+            view=RiskAgreementView(bot),  # View mit „I agree“ / „Cancel“ Buttons
             ephemeral=True
         )
-        return  # WICHTIG: sonst läuft es unten weiter
+        return  # NICHT weiter ausführen!
 
-    # Wenn bereits Details vorhanden, direkt Channel-Nachricht senden
+    # Wenn Details bereits vorhanden → direkt Nachricht im Verify-Channel posten
     verify_channel = next((c for c in interaction.guild.text_channels if c.topic == code[1:]), None)
     if verify_channel:
         await verify_channel.send(
@@ -662,7 +631,7 @@ async def verify(interaction: discord.Interaction, code: str):
             "* We reserve the right to withhold any earned revenue or pending payouts\n\n"
             "This includes fake follower counts, made-up prices, and manipulated stats."
         )
-
+        
 class SubmissionReviewView(View):
     def __init__(self, bot, submission):
         super().__init__(timeout=None)
