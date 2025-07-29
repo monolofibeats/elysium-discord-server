@@ -588,36 +588,68 @@ SUBMISSIONS_PATH = os.path.join(BASE_DIR, "campaign-ui", "campaign-ui", "submiss
     username="Your username or playlist ID"
 )
 async def verify_command(interaction: discord.Interaction, platform: str, username: str):
-    submissions = load_submissions()
     user = interaction.user
-    user_id = str(user.id)
+    user_id = user.id
     code = verification_codes.get(user.id)
 
-    # Prüfe, ob bereits Submission existiert
-    user_sub = get_submission_by_id(submissions, user_id)
-
-    # Submission zwischenspeichern (wird später ergänzt)
-    bot.temp_submissions[user.id] = {
-        "platform": platform,
-        "username": username,
-        "bio": "N/A",
-        "code": code,
-    }
-
-    # ✅ Wenn noch keine Details gespeichert → Final Warning zeigen
-    if not user_sub or not user_sub.get("details"):
+    if not code:
         await interaction.response.send_message(
-            content=(
-                "**⚠️ Final Warning – Read Carefully!**\n\n"
-                "By continuing, you confirm that the information you’re about to provide is **truthful**.\n"
-                "**Any attempt to manipulate views, follower stats, or pricing will result in a permanent ban** and full denial of payment.\n\n"
-                "If you're unsure, please **cancel** now and contact support first."
-            ),
-            view=RiskAgreementView(bot),
+            "❌ Du hast keinen aktiven Verifizierungscode. Bitte zuerst `/apply` ausführen.",
             ephemeral=True
         )
         return
 
+    # Profil-URL bauen
+    url = {
+        "tiktok": f"https://www.tiktok.com/@{username}",
+        "instagram": f"https://www.instagram.com/{username}",
+        "youtube": f"https://www.youtube.com/@{username}",
+        "spotify": f"https://open.spotify.com/playlist/{username}"
+    }.get(platform.lower())
+
+    if not url:
+        await interaction.response.send_message("❌ Unbekannte Plattform. Bitte wähle TikTok, Instagram, YouTube oder Spotify.", ephemeral=True)
+        return
+
+    # Profil-HTML abrufen
+    try:
+        import aiohttp
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as resp:
+                html = await resp.text()
+    except Exception as e:
+        await interaction.response.send_message(f"⚠️ Fehler beim Abrufen des Profils: {e}", ephemeral=True)
+        return
+
+    # Codeprüfung im HTML
+    if code not in html:
+        await interaction.response.send_message(
+            f"❌ Dein Code `{code}` wurde auf dem Profil **nicht gefunden**.\n"
+            f"Bitte stelle sicher, dass er sichtbar in deiner Bio oder Beschreibung steht.",
+            ephemeral=True
+        )
+        return
+
+    # ✅ Alles korrekt → Temp Submission speichern
+    bot.temp_submissions[user.id] = {
+        "platform": platform,
+        "username": username,
+        "bio": "N/A",  # Wird evtl. später noch ausgelesen
+        "code": code
+    }
+
+    # ⚠️ Final Warning anzeigen
+    await interaction.response.send_message(
+        content=(
+            "**⚠️ Final Warning – Read Carefully!**\n\n"
+            "By continuing, you confirm that the information you’re about to provide is **truthful**.\n"
+            "**Any attempt to manipulate views, follower stats, or pricing will result in a permanent ban** and full denial of payment.\n\n"
+            "If you're unsure, please **cancel** now and contact support first."
+        ),
+        view=RiskAgreementView(bot),
+        ephemeral=True
+    )
+    
     # ✅ Wenn bereits Details existieren, nur Channel-Nachricht senden
     verify_channel = next((c for c in interaction.guild.text_channels if c.topic == code[1:]), None)
     if verify_channel:
