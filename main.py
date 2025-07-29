@@ -10,6 +10,7 @@ import uuid, datetime
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 import os
+os.system("playwright install --with-deps")
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
