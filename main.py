@@ -590,21 +590,21 @@ SUBMISSIONS_PATH = os.path.join(BASE_DIR, "campaign-ui", "campaign-ui", "submiss
 async def verify_command(interaction: discord.Interaction, platform: str, username: str):
     submissions = load_submissions()
     user = interaction.user
+    user_id = str(user.id)
     code = verification_codes.get(user.id)
 
-    user_id = str(user.id)
     user_sub = get_submission_by_id(submissions, user_id)
 
-    # Speichere temporäre Submission (für spätere Modals etc.)
+    # Speichere temp Submission
     bot.temp_submissions[user.id] = {
         "platform": platform,
         "username": username,
-        "bio": "N/A",  # Kann später durch Scraper oder Modal ersetzt werden
+        "bio": "N/A",  # Optional, kannst du später ersetzen
         "code": code,
     }
 
-    # Wenn noch keine Details vorhanden → Risiko-Warnung + Button
-    if not user_sub or not user_sub.get("details"):
+    # Wenn noch keine Details vorhanden → Final Warning + Modal starten
+    if not user_sub.get("details"):
         await interaction.response.send_message(
             content=(
                 "**⚠️ Final Warning – Read Carefully!**\n\n"
@@ -612,12 +612,12 @@ async def verify_command(interaction: discord.Interaction, platform: str, userna
                 "**Any attempt to manipulate views, follower stats, or pricing will result in a permanent ban** and full denial of payment.\n\n"
                 "If you're unsure, please **cancel** now and contact support first."
             ),
-            view=RiskAgreementView(bot),  # View mit „I agree“ / „Cancel“ Buttons
+            view=RiskAgreementView(bot),
             ephemeral=True
         )
-        return  # NICHT weiter ausführen!
+        return  # WICHTIG: ohne return geht’s unten weiter
 
-    # Wenn Details bereits vorhanden → direkt Nachricht im Verify-Channel posten
+    # Wenn bereits Details vorhanden → Channel-Reminder
     verify_channel = next((c for c in interaction.guild.text_channels if c.topic == code[1:]), None)
     if verify_channel:
         await verify_channel.send(
