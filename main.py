@@ -593,18 +593,18 @@ async def verify_command(interaction: discord.Interaction, platform: str, userna
     user_id = str(user.id)
     code = verification_codes.get(user.id)
 
-    user_sub = get_submission_by_id(submissions, user_id)
+    user_sub = get_submission_by_id(submissions, user_id) or {}
 
-    # Speichere temp Submission
+    # Submission zwischenspeichern
     bot.temp_submissions[user.id] = {
         "platform": platform,
         "username": username,
-        "bio": "N/A",  # Optional, kannst du später ersetzen
+        "bio": "N/A",  # Kann später ergänzt werden
         "code": code,
     }
 
-    # Wenn noch keine Details vorhanden → Final Warning + Modal starten
-    if not user_sub.get("details"):
+    # Starte RiskAgreementView, wenn keine Details vorhanden
+    if "details" not in user_sub:
         await interaction.response.send_message(
             content=(
                 "**⚠️ Final Warning – Read Carefully!**\n\n"
@@ -615,7 +615,7 @@ async def verify_command(interaction: discord.Interaction, platform: str, userna
             view=RiskAgreementView(bot),
             ephemeral=True
         )
-        return  # WICHTIG: ohne return geht’s unten weiter
+        return
 
     # Wenn bereits Details vorhanden → Channel-Reminder
     verify_channel = next((c for c in interaction.guild.text_channels if c.topic == code[1:]), None)
