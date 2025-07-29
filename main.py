@@ -611,13 +611,13 @@ async def verify_command(interaction: discord.Interaction, platform: str, userna
 
     try:
         if platform == "tiktok":
-            bio = await get_tiktok_bio(username)
+            bio = await get_tiktok_bio(username, code)
         elif platform == "instagram":
-            bio = await get_instagram_bio(username)
+            bio = await get_instagram_bio(username, code)
         elif platform == "youtube":
-            bio = await get_youtube_description(username)
+            bio = await get_youtube_description(username, code)
         elif platform == "spotify":
-            bio = await get_playlist_description(username)
+            bio = await get_playlist_description(username, code)
         else:
             await interaction.followup.send("❌ Unbekannte Plattform. Bitte wähle TikTok, Instagram, YouTube oder Spotify.")
             return
@@ -649,7 +649,7 @@ async def verify_command(interaction: discord.Interaction, platform: str, userna
         ),
         view=RiskAgreementView(bot)
     )
-        
+    
 class SubmissionReviewView(View):
     def __init__(self, bot, submission):
         super().__init__(timeout=None)
