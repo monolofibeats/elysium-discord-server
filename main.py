@@ -604,7 +604,7 @@ async def verify_command(interaction: discord.Interaction, platform: str, userna
     }
 
     # Wenn noch keine Details vorhanden → Risiko-Warnung + Button
-    if not user_sub.get("details"):
+    if not user_sub or not user_sub.get("details"):
         await interaction.response.send_message(
             content=(
                 "**⚠️ Final Warning – Read Carefully!**\n\n"
